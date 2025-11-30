@@ -181,6 +181,7 @@ function App() {
     }
   };
 
+  //agregar codigo del ganador predefinido. 
   const getRandomWinner = (): Option | null => {
     if (availableOptions.length === 0) return null;
     const index = Math.floor(Math.random() * availableOptions.length);
@@ -188,7 +189,7 @@ function App() {
     const originalIndex = allOptions.indexOf(winnerValue);
     return { value: winnerValue, index: originalIndex };
   };
-
+//hasta aca
   const triggerConfetti = () => {
     const count = 400;
     const defaults = {
@@ -325,7 +326,7 @@ function App() {
   }, [allOptions, eliminatedOptions]);
 
   return (
-    <div className="min-h-screen bg-[url('/images/fondo.jpg')] bg-contain bg-no-repeat bg-center p-4">
+    <div className="min-h-screen bg-[url('/images/fondo1.jpg')] bg-contain bg-no-repeat bg-center p-4">
       <button
         onClick={() => setShowOptions(!showOptions)}
         className="fixed top-4 left-4 z-50 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100"
@@ -343,6 +344,7 @@ function App() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-green-800">Opciones</h2>
               <div className="flex gap-2">
+                  {/*Agregar boton para boton predefinido al ganador.*/}
                 <button
                   onClick={clearAllOptions}
                   className="text-red-500 hover:text-red-700"
