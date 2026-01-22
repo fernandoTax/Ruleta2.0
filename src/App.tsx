@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Menu, X, Shuffle, Trash2 } from 'lucide-react';
+import { Menu, X, Shuffle, Trash2, Target } from 'lucide-react';
 
 interface Option {
   value: string;
@@ -11,6 +11,13 @@ function App() {
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<Option | null>(null);
   const [showWinnerModal, setShowWinnerModal] = useState(false);
+  // 🎯 Modo ganador al 3er giro
+  const [thirdSpinMode, setThirdSpinMode] = useState(false);
+  const [spinCounter, setSpinCounter] = useState(0);
+  // 🎯 Control de descarte
+const [isDiscarded, setIsDiscarded] = useState(false);
+
+
 
   const [allOptions, setAllOptions] = useState<string[]>([]);
   const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
@@ -31,6 +38,12 @@ function App() {
   const DISPLAY_CHUNK_SIZE = 100;
 
   /* ================= OPCIONES ================= */
+  useEffect(() => {
+  if (!thirdSpinMode) {
+    setSpinCounter(0);
+  }
+}, [thirdSpinMode]);
+
 
   const availableOptions = useMemo(() => {
     return allOptions.filter(o => !eliminatedOptions.includes(o));
@@ -153,36 +166,62 @@ function App() {
   };
 
   const spinWheel = () => {
-    if (spinning || !availableOptions.length) return;
+  if (spinning || !availableOptions.length) return;
 
-    setSpinning(true);
-    setWinner(null);
-    setShowWinnerModal(false);
+  setSpinning(true);
+  setWinner(null);
+  setShowWinnerModal(false);
+  setIsDiscarded(false);
 
-    spinSound.current?.play();
+  spinSound.current?.play();
 
-    const result = getRandomWinner();
-    const rotation = calculateFinalRotation();
+  let result: Option | null = null;
+  let discarded = false;
 
-    startChangingOptions();
-    animateWheel(0, rotation, SPIN_DURATION);
+  // 🎯 MODO 3er GIRO
+  if (thirdSpinMode) {
+    setSpinCounter(prev => prev + 1);
 
-    setTimeout(() => {
-      stopChangingOptions();
-      spinSound.current?.pause();
+    if (spinCounter < 2) {
+      // ❌ Giro 1 y 2 → DESCARTADO
+      result = getRandomWinner();
+      discarded = true;
+    } else {
+      // 🏆 Giro 3 → GANADOR REAL
+      result = getRandomWinner();
+      discarded = false;
+    }
+  } else {
+    // 🎯 DESACTIVADO → normal
+    result = getRandomWinner();
+  }
 
-      if (result) {
-        setCurrentOption(result.value);
-        setWinner(result);
-        setEliminatedOptions(prev => [...prev, result.value]);
-        setShowWinnerModal(true);
+  const rotation = calculateFinalRotation();
+
+  startChangingOptions();
+  animateWheel(0, rotation, SPIN_DURATION);
+
+  setTimeout(() => {
+    stopChangingOptions();
+    spinSound.current?.pause();
+
+    if (result) {
+      setCurrentOption(result.value);
+      setWinner(result);
+      setIsDiscarded(discarded);
+      setEliminatedOptions(prev => [...prev, result.value]);
+      setShowWinnerModal(true);
+
+      if (!discarded) {
         winSound.current?.play();
         triggerConfetti();
       }
+    }
 
-      setSpinning(false);
-    }, SPIN_DURATION);
-  };
+    setSpinning(false);
+  }, SPIN_DURATION);
+};
+
 
   /* ================= EFECTOS ================= */
 
@@ -242,14 +281,37 @@ function App() {
         {showOptions && (
           <div className="w-100 bg-white p-6 rounded-lg shadow-lg h-fit">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-green-800">Opciones</h2>
-              <button
-                onClick={clearAllOptions}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
+  <h2 className="text-xl font-bold text-green-800">Opciones</h2>
+
+  <div className="flex items-center gap-2">
+    {/* 🎯 BOTÓN 3er GIRO */}
+    <button
+  onClick={() => {
+    setThirdSpinMode(prev => !prev);
+    setSpinCounter(0);
+  }}
+  title="Ganador hasta el 3er giro"
+  className={`
+    p-2 rounded-full border transition
+    ${thirdSpinMode
+      ? 'bg-yellow-400 border-yellow-500'
+      : 'bg-gray-200 border-gray-300'}
+  `}
+>
+  🎯
+</button>
+
+
+    {/* 🗑️ BORRAR */}
+    <button
+      onClick={clearAllOptions}
+      className="text-red-500 hover:text-red-700"
+    >
+      <Trash2 size={20} />
+    </button>
+  </div>
+</div>
+
 
             <textarea
               value={optionsInput}
@@ -306,7 +368,7 @@ function App() {
           <div className="absolute inset-1/3 center-circle rounded-full flex items-center justify-center">
             <div className="center-logo">
               <span className="text-lg font-bold text-green-800">
-                COPEBA, R.L.
+                COPEBA 
               </span>
             </div>
           </div>
@@ -358,25 +420,44 @@ function App() {
        </div>
 
       {/* MODAL GANADOR */}
-      {showWinnerModal && winner && (
+            {showWinnerModal && winner && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl">
-            <h2 className="text-2xl font-bold text-green-800 mb-4">
-              🎉 ¡Felicidades al Ganador!
-            </h2>
-            <p className="text-xl mb-4">{winner.value}</p>
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center min-w-[300px]">
+
+            {isDiscarded ? (
+              <>
+                <h2 className="text-2xl font-bold text-red-600 mb-4">
+                  ❌ DESCARTADO
+                </h2>
+                <p className="text-xl mb-6 text-gray-700">
+                  {winner.value}
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-green-700 mb-4">
+                  🎉 ¡Felicidades al Ganador!
+                </h2>
+                <p className="text-xl mb-6">
+                  {winner.value}
+                </p>
+              </>
+            )}
+
             <button
               onClick={() => setShowWinnerModal(false)}
-              className="bg-green-600 text-white px-6 py-2 rounded"
+              className={`px-6 py-2 rounded text-white ${
+                isDiscarded ? 'bg-gray-500' : 'bg-green-600'
+              }`}
             >
               Cerrar
             </button>
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
 export default App;
+
