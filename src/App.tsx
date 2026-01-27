@@ -136,7 +136,7 @@ const [isDiscarded, setIsDiscarded] = useState(false);
         optionsBuffer.current[index % optionsBuffer.current.length]
       );
       index++;
-    }, 60); // ← velocidad estable (sin trabarse)
+    }, 70); // ← velocidad estable (sin trabarse)
   };
 
   const stopChangingOptions = () => {
