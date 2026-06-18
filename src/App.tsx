@@ -264,7 +264,7 @@ const [isDiscarded, setIsDiscarded] = useState(false);
   /* ================= UI ================= */
 
   return (
-    <div className="min-h-screen bg-[url('/images/mundial4.png')] bg-contain bg-no-repeat bg-center p-4">
+    <div className="min-h-screen bg-[url('/images/mundial6.png')] bg-contain bg-no-repeat bg-center p-4">
 
       {/* BOTÓN MENÚ */}
       <button
