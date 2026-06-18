@@ -264,7 +264,7 @@ const [isDiscarded, setIsDiscarded] = useState(false);
   /* ================= UI ================= */
 
   return (
-    <div className="min-h-screen bg-[url('/images/fondoCopebaFest.jpg')] bg-contain bg-no-repeat bg-center p-4">
+    <div className="min-h-screen bg-[url('/images/mundial4.png')] bg-contain bg-no-repeat bg-center p-4">
 
       {/* BOTÓN MENÚ */}
       <button
@@ -436,10 +436,10 @@ const [isDiscarded, setIsDiscarded] = useState(false);
             ) : (
               <>
                 <h2 className="text-2xl font-bold text-green-700 mb-4">
-                  🎉 ¡Felicidades al Ganador!
+                 ¡Felicidades al Ganador!
                 </h2>
                 <p className="text-xl mb-6">
-                  {winner.value}
+                 El ganador es:  {winner.value}
                 </p>
               </>
             )}
