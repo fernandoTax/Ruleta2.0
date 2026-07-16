@@ -136,7 +136,7 @@ const [isDiscarded, setIsDiscarded] = useState(false);
         optionsBuffer.current[index % optionsBuffer.current.length]
       );
       index++;
-    }, 70); // ← velocidad estable (sin trabarse)
+    }, 60); // ← velocidad estable (sin trabarse)
   };
 
   const stopChangingOptions = () => {
@@ -264,7 +264,8 @@ const [isDiscarded, setIsDiscarded] = useState(false);
   /* ================= UI ================= */
 
   return (
-    <div className="min-h-screen bg-[url('/images/mundial6.png')] bg-contain bg-no-repeat bg-center p-4">
+
+    <div className="min-h-screen bg-[url('/images/a.png')] bg-contain bg-no-repeat bg-center p-4">
 
       {/* BOTÓN MENÚ */}
       <button
@@ -409,7 +410,7 @@ const [isDiscarded, setIsDiscarded] = useState(false);
   <button
     onClick={spinWheel}
     disabled={spinning}
-    className="mt-6 px-8 py-4 bg-green-600 text-white rounded-full text-xl"
+    className="mt-6 px-8 py-4 bg-blue-600 text-white rounded-full text-xl"
   >
     {spinning ? '¡Girando!' : 'Girar Ruleta'}
   </button>
